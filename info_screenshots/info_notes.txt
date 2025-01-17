@@ -1,0 +1,31 @@
+**********JWT :  How it verifies the token..does it store the token in db*********
+Extract the Header and Payload:
+Decode the Base64Url-encoded header and payload.
+
+Recreate the Signature:
+The server takes the decoded header and payload, concatenates them, 
+and then hashes this string using the HS256 algorithm and the shared secret key.
+
+Compare Signatures:
+The server compares the signature it just generated with the signature included in the JWT.
+If they match, the token is considered valid.
+
+**********will the token generation be same with same username and same role*************
+No, the token generation will not be the same for the same username and role even if these values remain 
+unchanged. This is because JWTs typically include other dynamic information, such as:Expiration Time, issued At
+
+**********Can You Have Different secret_keys for Different Tokens?******************
+Single secret_key: Use one secret_key for your entire API or application.
+Keep It Secure: Store the secret_key securely, such as in environment variables or a secure key management service.
+
+
+"""@app.post("/loginSubmit",status_code=status.HTTP_201_CREATED)
+async def user_post(post : ClientLogin,db:Session = Depends(get_db)):
+    post = post.dict()
+    mobileNumber=str(post['mobileNumber'])
+    password=post['password']
+    verificationStatus=await loginverification( mobileNumber, password, db, pwd_context)
+    verificationStatus['mobileNumber']=  mobileNumber
+    return verificationStatus"""
+
+

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Form</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/register.css">
+    <script src="/static/js/register.js">  </script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Registration Form</h2>
+        <form name="registrationForm" id="registrationForm" action="/registerSubmit" method="POST" onsubmit="return validateForm()">
+            <div class="form-group">
+                <label for="userName">User Name</label>
+                <input type="text" class="form-control" id="userName" name="userName">
+            </div>
+            <div class="form-group">
+                <label for="emailId">Email ID</label>
+                <input type="email" class="form-control" id="emailId" name="emailId">
+            </div>
+            <div class="form-group">
+                <label for="mobileNumber">Mobile Number</label>
+                <input type="text" class="form-control" id="mobileNumber" name="mobileNumber">
+            </div>
+            <div class="form-group">
+                <label for="firmName">Firm Name</label>
+                <input type="text" class="form-control" id="firmName" name="firmName">
+            </div>
+            <div class="form-group">
+                <label for="location">Location</label>
+                <input type="text" class="form-control" id="location" name="location">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" class="form-control" id="password" name="password">
+            </div>
+            <div class="form-group">
+                <label for="state">State</label>
+                <input type="text" class="form-control" id="state" name="state">
+            </div>
+            <div class="form-group">
+                <label for="country">Country</label>
+                <input type="text" class="form-control" id="country" name="country">
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,37 @@
+any changes in the code, save it(ctrl+s)..it reload the fastapi application with applied changes 
+on running server and den directly make the request for any api 
+u dont have to once agin login to generate new token for the change in application.
+
+***************************
+token generated have expiry time lets say 10min..from the time of creation.
+after 10min if u try to call any api using this token it shows JWT error:could not validate credentials coz of expiry of oken
+
+********************************
+why the concept of tokens
+*********************************
+SESSION BASED AUTHENTICATION
+In traditional method username and password are passed to server..Server validates and then generates a session ID
+(a dedicated channel/link) and stores the session data(user name and password,role all such credentials) in the server database.
+It then sends the session ID to client so that futher if any api calls are made it uses this session ID...using which servercan 
+validate the user authentication and authorization.
+DISADVANTAGE:It takes extensive resource in the memory for storage of session data
+Its not scalable
+
+TOKEN BASED AUTHENTICATION
+Its a stateless as no such dedicated pathway session ID is created.Token is a self contained proof of authentication
+Here server donnot store any such state as no session is created.
+Client for the first time sends username and password.Server validates it and geneerates token that stores all user information
+(for authorization and authentication)in a crypted manner.It shares the token with client.on futher api calls client 
+uses this token,on receiving the server decodes and validates the user role and access for api.
+ADVANTAGE:It is scalable as server store no session data..rather it validates token for each request.
+removes the overhead of session management
+
+JWT TOKEN*
+*************
+header|payload|signature
+header-encoded using base64 ...on decoding it gets to know hashing algo used
+payload-encoded using base64
+
+server side...header+payload+secret key(which only server knows) aplly hashing algo..
+if get the stringsame as signature,it accepts the request or else rejects the request
+once on validation..it decodes the payload and extraxts the details and accordingly returns the data to user
