@@ -43,12 +43,13 @@ import passlib
 import bcrypt
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from jose import JWTError, jwt
+from jose import JWTError, jwt, ExpiredSignatureError
 from datetime import datetime, timedelta
+from searchLogic import search_query_date_func,search_query_invoice_func,search_query_party_func,party_list_search_query
 
 SECRET_KEY = "your_secret_key"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 10
+ACCESS_TOKEN_EXPIRE_MINUTES = 100
 
 app = FastAPI()
 
@@ -96,8 +97,10 @@ def hash_password(password: str):
 def get_current_user(token:str = Depends(oauth2_scheme)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+
         mobilenumber = payload.get("sub")
         role = payload.get("role")
+
         if mobilenumber is None or role is None:
             return{
                     "status" : 0,
@@ -111,11 +114,17 @@ def get_current_user(token:str = Depends(oauth2_scheme)):
                     "mobilenumber": mobilenumber,
                     "role": role
                }
-    
-    except JWTError:
+    except ExpiredSignatureError:
+          return{
+                    "status" : 0,
+                    "message" : "Token has expired",
+                    "mobilenumber":"",
+                    "role":""
+              }
+    except JWTError as e:
         return{
                     "status" : 0,
-                    "message":"Could not validate credentials",
+                    "message":f"Invalid token: {e}",
                     "mobilenumber":"",
                     "role":""
               }
@@ -141,6 +150,8 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
 async def dashboard_display_admin(db2 : Session):
     saleDic = await dashboardSale(db2)
     if saleDic["status"]==0:
+        saleDic['curr_day_num'] = "",
+        saleDic['curr_week_num'] = "",
         saleDic["current_month"] ="",
         saleDic["current_quarter"] ="",
         saleDic["current_year"] ="",
@@ -152,6 +163,9 @@ async def dashboard_display_admin(db2 : Session):
     
     purchaseDic = await dashboardPurchase(db2)
     if purchaseDic["status"]==0:
+
+        saleDic['curr_day_num'] = "",
+        saleDic['curr_week_num'] = "",
         purchaseDic["current_month"] ="",
         purchaseDic["current_quarter"] ="",
         purchaseDic["current_year"] ="",
@@ -163,18 +177,19 @@ async def dashboard_display_admin(db2 : Session):
 
     response = {
         "status" : "1",
-        "curr_day_num" : saleDic['curr_day_num'],
-        "curr_week_num" : saleDic['curr_week_num'],
         "message" : "Successfully calculated",
-        "current_month " : saleDic['name'][0],
-        "current_quarter " : saleDic['name'][1],
-        "current_year " : saleDic['name'][2],
 
-        "sale" : {"monthly":saleDic['value'][0],"quarterly":saleDic['value'][1],"yearly":saleDic['value'][2],
+        "sale" : {"curr_day_num" : saleDic['curr_day_num'],"curr_week_num" : saleDic['curr_week_num'],
+                  "current_month " : saleDic['name'][0],"current_quarter " : saleDic['name'][1],
+                "current_year " : saleDic['name'][2],
+                "monthly":saleDic['value'][0],"quarterly":saleDic['value'][1],"yearly":saleDic['value'][2],
                 "curr_month_day_values":saleDic['graph'][0],"curr_quarter_week_values":saleDic['graph'][1],
                 "curr_year_month_values":saleDic['graph'][2]},
 
-        "purchase" : {"monthly":purchaseDic['value'][0],"quarterly":purchaseDic['value'][1],
+        "purchase" : {"curr_day_num" : saleDic['curr_day_num'],"curr_week_num" : saleDic['curr_week_num'],
+                      "current_month " : saleDic['name'][0],"current_quarter " : saleDic['name'][1],
+                    "current_year " : saleDic['name'][2],
+                    "monthly":purchaseDic['value'][0],"quarterly":purchaseDic['value'][1],
                     "yearly":purchaseDic['value'][2],"curr_month_day_values":purchaseDic['graph'][0],
                     "curr_quarter_week_values":purchaseDic['graph'][1],"curr_year_month_values":purchaseDic['graph'][2]},
         "top_products_by_cash" : saleDic['top_products_by_cash'],
@@ -237,7 +252,7 @@ async def user_post(post : ClientRegistration,db:Session = Depends(get_db)):
             jsonRegistrationstatus = {"status":"0", "message":f" Error: {e}"}
     return jsonRegistrationstatus
 
-@app.post("/amountDisplay",status_code=status.HTTP_201_CREATED)
+@app.post("/amountDisplay")
 async def amount_display(post : AmountCalc, user:dict = Depends(require_admin), db:Session = Depends(get_db2) ):
         post = post.dict()
         type_sale_purchase = post['type']
@@ -246,19 +261,38 @@ async def amount_display(post : AmountCalc, user:dict = Depends(require_admin), 
         amountDisplayStatus = await displayAmount_check(type_sale_purchase, time_period, db)
         return amountDisplayStatus
 
-@app.post("/dashboard",status_code=status.HTTP_201_CREATED)
+@app.post("/dashboard")
 async def dashboard_display(post : ClientDataDashboard,db2:Session = Depends(get_db2),user : dict = Depends(require_admin)):
     #post = post.dict()
     #userid=int(post['userId'])
     #token=post['token']
-    if user['role'] == "":
+    if user['status'] == 0:
         return user
     elif user['role'] == "admin":
         return await dashboard_display_admin(db2)
     else:
         return await dashboard_display_nonadmin(db2)
 
-@app.post("/searchQuery",status_code=status.HTTP_201_CREATED)
-def search_query(post:ClientDataSearchQuery,db2:Session = Depends(get_db2),user:dict = Depends(require_admin)):
-    pass
+@app.post("/searchQuery")
+async def search_query_invoice(post:ClientDataSearchQuery,db2:Session = Depends(get_db2),user : dict = Depends(require_admin)):
+    if user['status'] == 0:
+        return user
     
+    post_dic= post.dict()
+    sType = post_dic['sType']
+    typeFilter  =  post_dic["typeFilter"]
+    flag = int(post_dic['flag'])
+     
+    if flag == 0:
+        return(await party_list_search_query(post,db2))
+    elif(flag == 1):
+        if typeFilter == "invoice":
+            return(await search_query_invoice_func(post,db2))
+        elif typeFilter == "party":
+            return(await search_query_party_func(post,db2))
+        elif typeFilter == "date":
+            return(await search_query_date_func(post,db2))
+    
+    
+
+

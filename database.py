@@ -12,7 +12,7 @@ engine = create_engine(URL_DATABASE)#echo = True
 sessionLocal = sessionmaker(autocommit = False, autoflush= False,bind = engine)
 Base = declarative_base()
 
-engine2 = create_engine(URL_DATABASE2)#echo = True
+engine2 = create_engine(URL_DATABASE2,echo = True)#echo = True
 sessionLocal2 = sessionmaker(autocommit = False, autoflush= False,bind = engine2)
 Base2 = declarative_base()
 

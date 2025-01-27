@@ -22,10 +22,17 @@ class ClientLogin(BaseModel):
 
 class ClientDataDashboard(BaseModel):
     userId : str
-    token  : str
 
 class ClientDataSearchQuery(BaseModel):
-    searchWord : str
-    pageNum  : str
+   sType : str
+   typeFilter  : str
+   searchWord : str
+   startDate : str
+   endDate : str
+   pageNum  : str
+   totalPages : str
+   flag : str
+
+
 
 

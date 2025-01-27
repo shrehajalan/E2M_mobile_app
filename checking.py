@@ -45,8 +45,7 @@ async def mobileVerification(mobileNumber:str,db:Session):
             return {"status": 1}
     except Exception as e:
         return {"status": 0,"message":f"Error: {e}"}
-        
-    
+         
 async def displayAmount_check(type_sale_purchase : str,time_period : str, db : Session):
     current_year = datetime.now().year
     current_month = datetime.now().month

@@ -22,7 +22,7 @@ class SellerPartyListModel(Base):
     __tablename__ = "seller_party_list"
 
     sellerId = Column(Integer, primary_key=True,nullable=False, index=True,name="sellerid")
-    partyName = Column(String(50),nullable=False,name="PARTY_NAME")
+    sellerName = Column(String(50),nullable=False,name="PARTY_NAME")
     address = Column(String(50),name="Address",nullable=False)
     city =Column(String(50),name="city",nullable=False) 
     state = Column(String(50),name="State",nullable=False) 
@@ -88,11 +88,11 @@ class BuyerPartyListModel(Base):
     __tablename__ = "buyer_party_list"
 
     buyerId = Column(Integer, primary_key=True,nullable=False, index=True,name="buyerid")
-    partyName = Column(String(50),nullable=False,name="PARTY_NAME")
+    buyerName = Column(String(50),nullable=False,name="PARTY_NAME")
     address = Column(String(50),name="Address",nullable=False)
     city =Column(String(50),name="city",nullable=False) 
     state = Column(String(50),name="State",nullable=False) 
-    gst = Column(String(50),name="Gst",nullable=False)
+    gst = Column(String(50),name="Gst num",nullable=False)
     buyerPhone_num = Column(String(50),name="Buyer phone num",nullable=False) 
     gmail  = Column(String(50),name="gmail",nullable=False) 
     borrowedAmt =Column(Float,name="borrowed_amt",nullable=False) 
@@ -151,12 +151,25 @@ class ProductListModel(Base2):
     qrCode=  Column(String(255),name="QR_code",nullable=False)
 
 
+class TransactionBuyerModel(Base2):
+    __tablename__ = "transaction_buyer"
+    
+    invoice = Column(String(255),primary_key=True,autoincrement=True,name="Invoice no",index=True,nullable=False)
+    buyerId = Column(Integer,name="buyerid",nullable=False)
+    paymentStatus = Column(String(255),name="Payment_status",nullable=False)  
+    amount = Column(Float,name="Amount",nullable=False)
+    amountPaid = Column(Float,name="Amount_paid",nullable=False)
+    dateBill =  Column(Date,name="Date_bill",nullable=False)
 
+class TransactionSellerModel(Base2):
+    __tablename__ = "transaction_seller"
+    
+    invoice = Column(String(255),primary_key=True,autoincrement=True,name="Invoice no",index=True,nullable=False)
+    sellerId = Column(Integer,name="sellerid",nullable=False)
+    paymentStatus = Column(String(255),name="Payment_status",nullable=False)  
+    amount = Column(Float,name="Amount",nullable=False)
+    amountPaid = Column(Float,name="Amount_paid",nullable=False)
+    dateBill =  Column(Date,name="Date_bill",nullable=False)
 
-
-
-
-
-
-
-
+    
+ 
