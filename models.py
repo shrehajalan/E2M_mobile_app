@@ -1,5 +1,11 @@
-from sqlalchemy import Boolean, Integer, String, Column, Float, Date, LargeBinary, PrimaryKeyConstraint
-from database import Base,Base2
+from sqlalchemy import Boolean, Integer, String, Column, Float, Date, LargeBinary, PrimaryKeyConstraint,ForeignKey,Enum
+from sqlalchemy.orm import declarative_base
+#from database import Base,Base2,Base3
+
+Base = declarative_base()
+Base2 = declarative_base()
+Base3 = declarative_base()
+
 
 class ClientRegistrationModel(Base):
     __tablename__ = "ClientRegistration"
@@ -15,13 +21,14 @@ class ClientRegistrationModel(Base):
     password=Column(String(100))
     status=Column(Integer)
     role=Column(String(10))
+    uniqueCode = Column(String(4), unique=True, nullable=False)
 
-    
 #SELLER RELATED TABLE
-class SellerPartyListModel(Base):
+
+class SellerPartyListModel(Base2):
     __tablename__ = "seller_party_list"
 
-    sellerId = Column(Integer, primary_key=True,nullable=False, index=True,name="sellerid")
+    sellerId = Column(Integer, primary_key=True,autoincrement=True,nullable=False, index=True,name="sellerid")
     sellerName = Column(String(50),nullable=False,name="PARTY_NAME")
     address = Column(String(50),name="Address",nullable=False)
     city =Column(String(50),name="city",nullable=False) 
@@ -45,7 +52,6 @@ class HistorySellModel(Base2):
     unitPrice = Column(Float,name="unit_price",nullable=False)
     gst = Column(Float,name="GST",nullable=False)
     totalPrice = Column(Float,name="Total_price",nullable=False)
-
 
 class HistoryHandBillModel(Base2):
     __tablename__ = "history_sell_handbill"
@@ -81,13 +87,12 @@ class SellerSpecialRateModel(Base2):
     prodNum = Column(Integer, name="prod num",nullable=False) 
     rate = Column(Float,name="Rate",nullable=False)
 
-
 #BUYER RELATED TABLES
 
-class BuyerPartyListModel(Base):
+class BuyerPartyListModel(Base2):
     __tablename__ = "buyer_party_list"
 
-    buyerId = Column(Integer, primary_key=True,nullable=False, index=True,name="buyerid")
+    buyerId = Column(Integer, primary_key=True,autoincrement=True,nullable=False, index=True,name="buyerid")
     buyerName = Column(String(50),nullable=False,name="PARTY_NAME")
     address = Column(String(50),name="Address",nullable=False)
     city =Column(String(50),name="city",nullable=False) 
@@ -150,11 +155,12 @@ class ProductListModel(Base2):
     perUnit =  Column(String(255),name="per_unit",nullable=False)
     qrCode=  Column(String(255),name="QR_code",nullable=False)
 
+#TRANSACTION TABLE
 
 class TransactionBuyerModel(Base2):
     __tablename__ = "transaction_buyer"
     
-    invoice = Column(String(255),primary_key=True,autoincrement=True,name="Invoice no",index=True,nullable=False)
+    invoice = Column(String(255),primary_key=True,name="Invoice no",index=True,nullable=False)
     buyerId = Column(Integer,name="buyerid",nullable=False)
     paymentStatus = Column(String(255),name="Payment_status",nullable=False)  
     amount = Column(Float,name="Amount",nullable=False)
@@ -164,12 +170,99 @@ class TransactionBuyerModel(Base2):
 class TransactionSellerModel(Base2):
     __tablename__ = "transaction_seller"
     
-    invoice = Column(String(255),primary_key=True,autoincrement=True,name="Invoice no",index=True,nullable=False)
+    invoice = Column(String(255),primary_key=True,name="Invoice no",index=True,nullable=False)
     sellerId = Column(Integer,name="sellerid",nullable=False)
     paymentStatus = Column(String(255),name="Payment_status",nullable=False)  
     amount = Column(Float,name="Amount",nullable=False)
     amountPaid = Column(Float,name="Amount_paid",nullable=False)
     dateBill =  Column(Date,name="Date_bill",nullable=False)
 
+#RESOURCE(LIKE EMPLOYEE) RELATED TABLE(ADMIN)
+
+class EmployeeRegistrationModel(Base3):
+    __tablename__ = "employee_registration"
+
+    employeeId = Column(Integer, primary_key=True, autoincrement=True,index=True,nullable=False)
+    name = Column(String(30), nullable=False)
+    dateOfBirth = Column(Date, nullable=False)
+    gender = Column(String(10), nullable=False) 
+    mobileNum = Column(String(15), unique=True, nullable=False)  
+    mailId = Column(String(15), unique=True, nullable=False)  
+    address = Column(String(100), nullable=False)  
+    zip = Column(String(10), nullable=False) 
+    state = Column(String(20), nullable=False)
+    proofType = Column(String(20), nullable=False)
+    proofNumber = Column(String(20), unique=True, nullable=False) 
+    photo = Column(String(1000), nullable=True)  # Base64-encoded string for photo
+    bankName = Column(String(50), nullable=False)
+    accountNumber = Column(String(30), unique=True, nullable=False)  
+    ifscCode = Column(String(20), nullable=False)  
+    upiId = Column(String(30), unique=True, nullable=True)  
+    password= Column(String(30), nullable=True) 
+    role = Column(String(10), nullable=True) 
+    empReportingLatitude  = Column(Float, nullable=True) 
+    empReportingLongitude = Column(Float, nullable=True) 
+
+class EmployeeJobDetailsModel(Base3):
+    __tablename__ = "employ_job_details"
+
+    employeeId = Column(Integer, primary_key=True,autoincrement=True,index=True,nullable=False)
+    designation  = Column(String(30), nullable=False)
+    department  = Column(String(30), nullable=False)
+    joinDate   = Column(Date, nullable=False)
+    salary  = Column(Float, nullable=False)
+    leavesPerMonth = Column(Integer,nullable=False, default=0)
+    totalAdvance = Column(Float, nullable=False, default = 0.0)
+    leavesCarriedForward = Column(Integer,nullable=False, default=0)
+
+class EmployeeOtpModel(Base3):
+    __tablename__ = "employee_otp"
+
+    employeeId = Column(Integer, primary_key=True, autoincrement=True, index=True, nullable=False)
+    otp = Column(String(6), nullable=False)
+
+class EmployeeSalaryPaymentModel(Base3):
+    __tablename__ = "employee_salary_payments"
+
+    empPaymentId = Column(Integer, primary_key=True, autoincrement=True, index=True, nullable=False)
+    employeeId = Column(Integer, ForeignKey("employee_registration.employeeId", ondelete="CASCADE"), nullable=False)
+    salaryMonth = Column(String(20),nullable=False)
+    salaryYear = Column(String(20),nullable=False)
+    paymentDate = Column(Date, nullable=False) 
+    paymentMode = Column(String(20),Enum("Cash", "Bank Transfer", "Cheque", name="paymentMode"), nullable=False)
+    description =  Column(String(100),nullable=True, default="")
+    amountPaid  = Column(Float, nullable=False)
+
+class EmployeeExtraPaymentModel(Base3):
+    __tablename__ = "employee_extra_payments"
+
+    empExtraPaymentId = Column(Integer, primary_key=True, autoincrement=True, index=True, nullable=False)
+    employeeId = Column(Integer,ForeignKey("employee_registration.employeeId",ondelete="CASCADE"), nullable=False)
+    paymentDate = Column(Date, nullable=False) 
+    paymentType = Column(String(20),Enum("Bonus", "Advance Given", "Advance Returned", name="paymentType"), nullable=False)  
+    amount = Column(Float, nullable=False)
+    description =  Column(String(100),nullable=True, default="")
+    paymentMode = Column(String(20),Enum("Cash","Bank Transfer","Cheque","UPI","Advance Returned with Adjustment in Salary", name="paymentMode"), nullable=False)
+
+class ExpenseModel(Base3):
+    __tablename__ = "expense_data"
+
+    expenseId = Column(Integer, primary_key=True, autoincrement=True, index=True, nullable=False)
+    expenseDate = Column(Date, nullable=False) 
+    expenseType = Column(String(20),Enum("Logistics", "Rents", "Miscelleneous", name="expenseType"), nullable=False)   
+    paymentMode = Column(String(20),Enum("Cash","Net Banking","Cheque","UPI",name="paymentMode"), nullable=False)
+    description = Column(String(100),nullable=True, default="")
+    amount = Column(Float, nullable=False)
     
- 
+class EmployeeAttendanceModel(Base3):
+    __tablename__ = "employee_attendance"
+
+    attendanceId = Column(Integer, primary_key=True, autoincrement=True, index=True, nullable=False)
+    employeeId = Column(Integer,ForeignKey("employee_registration.employeeId",ondelete="CASCADE"), nullable=False)
+    attendanceDate = Column(Date, nullable=False) 
+    curLatitude = Column(Float, nullable=False)
+    curLongitude = Column(Float, nullable=False)
+    empPresentStatus  =  Column(Integer, nullable=False, default=0)
+
+
+

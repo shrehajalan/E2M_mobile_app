@@ -1,0 +1,10 @@
+CODING THE CHANGES INTO BRANCH
+git add .
+git commit -m "Your commit message here"
+git push -u origin mobile-api-branch2-27jan25
+
+
+NEW BRANCH
+git remote add origin https://github.com/shrehajalan/E2M_mobile_app.git
+git branch -M mobile-api-branch2-27jan25
+git push -u origin mobile-api-branch2-27jan25
