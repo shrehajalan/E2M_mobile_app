@@ -8,6 +8,7 @@ from sqlalchemy import desc,union_all
 from sqlalchemy import Integer
 import calendar
 
+
 async def MaxclientId(db:Session):
     try:
         result = db.query(ClientRegistrationModel).order_by(ClientRegistrationModel.clientId.desc()).first()
