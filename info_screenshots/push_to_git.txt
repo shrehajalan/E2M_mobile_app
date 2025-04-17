@@ -18,3 +18,7 @@ git push origin mobile-api-branch3-17Jan25
 "Stage all my changes to be committed."
 "Take a snapshot of the staged files and give it a message."
 "Send my local branch to GitHub under the same branch name."
+
+          Change Type         Vs           What to Do
+Small fixes / minor updates   |  Commit & push to same branch
+Big new feature or experiment |  Create a new branch to work safely
