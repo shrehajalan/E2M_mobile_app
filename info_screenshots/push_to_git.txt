@@ -15,9 +15,28 @@ git push origin mobile-api-branch3-17Jan25
 "Start tracking this folder with Git."
 "Connect this folder to my GitHub repository."Now Git knows where to send your files when you push.
 "Create a new branch named mobile-api-branch3-17Jan25 and switch to it."
-"Stage all my changes to be committed."
-"Take a snapshot of the staged files and give it a message."
+"Stage all my changes to be committed."Git moves that file to the staging area.
+"Take a snapshot of the staged files and give it a message." Saving the current staged files into Git's history as a new commit.
 "Send my local branch to GitHub under the same branch name."
+
+minor changes made on some file.wanna push it to github
+*******************************************************
+# 1. Check your current branch (just to be sure)
+git branch
+# 2. Check what changed
+git status
+# 3. Stage the changed file
+git add info_screenshots/push_to_git.txt
+# 4. Commit the change
+git commit -m "change the code of this file"
+# 5. Push to the same branch
+git push origin mobile-api-branch-3-17april25
+
+
+
+
+
+
 
           Change Type         Vs           What to Do
 Small fixes / minor updates   |  Commit & push to same branch
